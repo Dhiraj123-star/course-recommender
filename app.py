@@ -26,7 +26,14 @@ def read_root():
 def recommend_courses(request: QueryRequest):
     # Simple retrieval chain (no LLM yet—just similarity search)
     docs = vectorstore.similarity_search(request.query, k=request.top_k)
-    recommendations = [{"course": doc.page_content, "score": f"Similarity: {i+1}"} for i, doc in enumerate(docs)]
+    recommendations = [
+        {
+            "title": doc.metadata.get("title", "Untitled"),
+            "description": doc.page_content,
+            "score": f"Similarity: {i+1}"
+        }
+        for i, doc in enumerate(docs)
+    ]
     return {"recommendations": recommendations}
 
 if __name__ == "__main__":
