@@ -1,0 +1,6 @@
+
+Course 1: Introduction to Python Programming. Description: Learn basics of Python, variables, loops, and functions for beginners.
+Course 2: Machine Learning Fundamentals. Description: Dive into supervised and unsupervised learning with scikit-learn.
+Course 3: Web Development with React. Description: Build interactive UIs using React components and state management.
+Course 4: Data Science with Pandas. Description: Analyze data using Pandas for cleaning, visualization, and insights.
+Course 5: Natural Language Processing. Description: Explore tokenization, sentiment analysis, and transformers.
