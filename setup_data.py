@@ -1,8 +1,8 @@
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_community.document_loaders import TextLoader
-from langchain.text_splitter import CharacterTextSplitter
 from langchain_weaviate.vectorstores import WeaviateVectorStore
+from langchain_core.documents import Document
 import weaviate
+import pandas as pd
 
 # Connect to Weaviate (v4 syntax for local instance on custom port)
 client = weaviate.connect_to_local(
@@ -10,36 +10,54 @@ client = weaviate.connect_to_local(
     port=8081,
 )
 
-# Sample course data (as a simple text file content)
-sample_courses = """
-Course 1: Introduction to Python Programming. Description: Learn basics of Python, variables, loops, and functions for beginners.
-Course 2: Machine Learning Fundamentals. Description: Dive into supervised and unsupervised learning with scikit-learn.
-Course 3: Web Development with React. Description: Build interactive UIs using React components and state management.
-Course 4: Data Science with Pandas. Description: Analyze data using Pandas for cleaning, visualization, and insights.
-Course 5: Natural Language Processing. Description: Explore tokenization, sentiment analysis, and transformers.
-"""
+try:
+    # Load courses from CSV
+    csv_file = "courses.csv"
+    # Read CSV with explicit encoding and error handling
+    df = pd.read_csv(csv_file, encoding="utf-8", on_bad_lines="skip")
 
-# Save to temp file for loader
-with open("temp_courses.txt", "w") as f:
-    f.write(sample_courses)
+    # Log raw CSV data for debugging
+    print("Raw CSV data:")
+    print(df.to_string())
 
-# Load and split documents
-loader = TextLoader("temp_courses.txt")
-documents = loader.load()
-text_splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=0)
-docs = text_splitter.split_documents(documents)
+    # Filter out rows with missing or non-string titles/descriptions
+    df = df.dropna(subset=["title", "description"])  # Drop rows where either is NaN
+    df = df[df["title"].apply(lambda x: isinstance(x, str) and x.strip() != "")]  # Valid title
+    df = df[df["description"].apply(lambda x: isinstance(x, str) and x.strip() != "")]  # Valid description
 
-# Embeddings model
-embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    # Convert CSV rows to LangChain Documents
+    documents = [
+        Document(
+            page_content=row["description"],
+            metadata={"title": row["title"]}
+        )
+        for _, row in df.iterrows()
+    ]
 
-# Create vector store (deletes existing if schema exists)
-vectorstore = WeaviateVectorStore.from_documents(
-    docs,
-    embeddings,
-    client=client,
-    index_name="Courses",  # Collection name
-    text_key="text",  # Field for text
-)
+    # Log documents for inspection
+    print("Documents to be ingested:")
+    for doc in documents:
+        print(f"Title: {doc.metadata['title']}, Description: {doc.page_content}")
 
-print("Sample courses added to Weaviate!")
-client.close()
+    # Embeddings model
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+
+    # Delete existing Courses collection to avoid duplicates
+    try:
+        client.collections.delete("Courses")
+    except:
+        pass  # Ignore if collection doesn't exist
+
+    # Create vector store (no splitting, as descriptions are short)
+    vectorstore = WeaviateVectorStore.from_documents(
+        documents=documents,  # Correct keyword
+        embedding=embeddings,  # Correct keyword
+        client=client,
+        index_name="Courses",
+        text_key="text",
+    )
+
+    print(f"Added {len(documents)} courses to Weaviate from {csv_file}!")
+
+finally:
+    client.close()  # Ensure connection closes even on error
