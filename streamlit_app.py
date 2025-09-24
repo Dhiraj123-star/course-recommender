@@ -4,7 +4,7 @@ import requests
 API_URL = "http://localhost:8000/recommend"
 
 st.title("Simple Course Recommender")
-st.write("Enter your interests (e.g., 'machine learning') to get recommendations.")
+st.write("Enter your interests (e.g., 'machine learning') to get recommendations with AI explanations.")
 
 query = st.text_input("Your query:", placeholder="What are you interested in learning?")
 
@@ -15,7 +15,8 @@ if st.button("Get Recommendations") and query:
             data = response.json()
             st.success("Here are your top recommendations:")
             for rec in data["recommendations"]:
-                st.write(f"- **{rec['course']}** ({rec['score']})")
+                st.write(f"- **{rec['title']}**: {rec['description']}")
+                st.write(f"  *Why?* {rec['explanation']}")
         else:
             st.error("Error fetching recommendations. Check if API is running.")
 
