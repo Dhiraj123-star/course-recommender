@@ -8,3 +8,6 @@ __pycache__/
 *.pyo
 *.pyd
 *.pycache/
+
+# environment variables file
+.env
