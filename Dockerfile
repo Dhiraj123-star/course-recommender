@@ -13,13 +13,13 @@ COPY app.py .
 COPY setup_data.py .
 COPY streamlit_app.py .
 COPY courses.csv .
-COPY .env .
 
-# Run setup_data.py to populate Weaviate
-RUN python setup_data.py
+# Create entrypoint script to run setup_data.py and start FastAPI
+COPY entrypoint.sh .
+RUN chmod +x entrypoint.sh
 
 # Expose port 8000 for FastAPI
 EXPOSE 8000
 
-# Command to run FastAPI server
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+# Use entrypoint script to initialize and start server
+CMD ["./entrypoint.sh"]
