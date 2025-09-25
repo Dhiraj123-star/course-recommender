@@ -1,32 +1,35 @@
+
 # CourseRecommender 📚✨
 
 A simple course recommendation app to suggest learning paths based on your interests! 🚀
 
 ## Core Functionality 🌟
 
-**Query Input 🔍**: Enter what you want to learn (e.g., "machine learning").  
-**Smart Search 🧠**: Matches your query to relevant courses using vector similarity.  
-**Top Picks 🏆**: Displays the top 3 course recommendations with titles, descriptions, and AI-generated explanations.  
+**Query Input 🔍**: Enter what you want to learn (e.g., "machine learning").
+**Smart Search 🧠**: Matches your query to relevant courses using vector similarity.
+**Top Picks 🏆**: Displays the top 3 course recommendations with titles, descriptions, and AI-generated explanations.
 
 ## Tech Stack 🛠️
 
-- **FastAPI**: Serves a lightweight API to handle recommendation requests.  
-- **Weaviate**: Stores course data as vectors for fast, similarity-based search.  
-- **LangChain**: Manages embeddings and retrieval logic with HuggingFace models + GPT-4o-mini for explanations.  
-- **Streamlit**: Provides a clean UI for easy interaction.  
-- **Docker Compose**: Spins up a local Weaviate instance for persistence and search.  
+* **FastAPI**: Serves a lightweight API to handle recommendation requests.
+* **Weaviate**: Stores course data as vectors for fast, similarity-based search.
+* **LangChain**: Manages embeddings and retrieval logic with HuggingFace models + GPT-4o-mini for explanations.
+* **Streamlit**: Provides a clean UI for easy interaction.
+* **Docker Compose**: Spins up a local Weaviate instance for persistence and search.
+* **GitHub Actions**: Automates CI/CD for testing and deployment.
 
 ## How It Works 🔧
 
-Your query is embedded using **sentence-transformers/all-MiniLM-L6-v2**, searched against a vector database of courses, and returns the best matches in seconds!  
+Your query is embedded using **sentence-transformers/all-MiniLM-L6-v2**, searched against a vector database of courses, and returns the best matches in seconds!
 Each course result is then explained by **GPT-4o-mini**, showing *why* it’s relevant to your query.
 
 ## Getting Started 🚦
 
 ### 1. Run Weaviate locally with Docker Compose (port 8081) 🐳
+
 ```bash
 docker-compose up -d
-````
+```
 
 ### 2. Load sample courses into Weaviate 📂
 
@@ -70,10 +73,29 @@ Open [http://localhost:8501](http://localhost:8501) in your browser and enter a 
 
 ---
 
+## CI/CD with GitHub Actions ⚡
+
+We’ve added **GitHub Actions workflows** for continuous integration and deployment:
+
+* ✅ **Build & Test**: Automatically runs Python tests on every push and pull request.
+* 🐳 **Docker Build Check**: Ensures the Docker image builds successfully.
+* 🚀 **Deploy Ready**: Prepares the app for deployment pipelines.
+
+Workflows are defined in [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
+
+To enable CI/CD:
+
+1. Push your changes to GitHub.
+2. GitHub Actions will automatically run tests and verify builds.
+3. On success, you’re ready to deploy! 🎯
+
+---
+
 ✅ **New Updates**:
 
 * Integrated **GPT-4o-mini** for generating concise course explanations.
-* Added "Why?" section in Streamlit to show reasons behind each recommendation.
-* Updated README with simplified flow and clearer getting-started steps.
-* Existing features (Docker, `courses.csv`, FastAPI backend) remain intact.
+* Added **"Why?" section** in Streamlit to show reasons behind each recommendation.
+* Added **GitHub Actions workflows** for CI/CD automation.
+* Updated README with clearer setup instructions and CI/CD guide.
 
+---
